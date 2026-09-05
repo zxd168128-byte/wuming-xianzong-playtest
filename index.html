@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="mobile-extra.css">
+  <meta name="theme-color" content="#111a1c">
+  <meta name="description" content="原创国风修仙宗门经营游戏0.4.1+0.5A战斗原型：四资源经营、速度队列六人战、异灵根、阵法与战斗沙盒。">
+  <title>无名仙宗 · 手机试玩 0.5A</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="mist mist-a" aria-hidden="true"></div>
+  <div class="mist mist-b" aria-hidden="true"></div>
+  <div id="app" class="game-shell">
+    <header class="topbar">
+      <button class="brand" data-action="tab" data-tab="sect" aria-label="返回宗门">
+        <span class="brand-seal">掌</span>
+        <span><strong id="sect-name">无名山门</strong><small>宗门录 · 0.4.1 · 战斗0.5A</small></span>
+      </button>
+      <div id="resources" class="resource-strip" aria-label="宗门资源"></div>
+      <button class="quiet-button" data-action="reset" title="重开试玩">重开</button>
+    </header>
+
+    <main>
+      <section class="scene-panel">
+        <img src="assets/sect-dawn.png" alt="晨雾中的破败修仙宗门">
+        <div class="scene-shade"></div>
+        <div class="scene-copy">
+          <p class="eyebrow" id="scene-eyebrow">青崖山南麓 · 第1日</p>
+          <h1 id="scene-title">残门亦可问长生</h1>
+          <p id="scene-text">灵脉微弱，丹炉已裂，债主七日后再来。你手里只有一枚旧掌门印。</p>
+          <div class="scene-actions">
+            <button class="primary-button" data-action="claim">收取灵息</button>
+            <button class="ink-button" data-action="tab" data-tab="expedition">前往秘境</button>
+          </div>
+        </div>
+        <div id="goal-card" class="goal-card"></div>
+      </section>
+
+      <nav class="main-nav" aria-label="主要玩法">
+        <button class="active" data-action="tab" data-tab="sect"><span>山</span>宗门</button>
+        <button data-action="tab" data-tab="disciples"><span>人</span>弟子</button>
+        <button data-action="tab" data-tab="recruit"><span>缘</span>仙缘阁</button>
+        <button data-action="tab" data-tab="expedition"><span>剑</span>秘境</button>
+        <button data-action="tab" data-tab="sandbox"><span>试</span>沙盒</button>
+        <button data-action="tab" data-tab="chronicle"><span>录</span>纪事</button>
+      </nav>
+
+      <section id="view" class="view" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal" hidden></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="core.js"></script>
+  <script src="combat-0.5a.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

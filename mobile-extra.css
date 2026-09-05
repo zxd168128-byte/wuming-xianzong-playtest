@@ -1,0 +1,115 @@
+/* Phone-first polish for immortal-sect mobile preview */
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+body {
+  padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+}
+.game-shell {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+}
+.topbar {
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  gap: 10px;
+}
+.resource-strip {
+  width: 100%;
+  padding-bottom: 4px;
+  gap: 6px;
+}
+.resource {
+  padding: 6px 8px;
+  flex: 0 0 auto;
+}
+.quiet-button, .ink-button, .primary-button, .small-button,
+.main-nav button, .assignment-line, .disciple-card {
+  min-height: 44px;
+}
+.main-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.scene-panel {
+  min-height: min(52vh, 420px);
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+}
+.scene-actions {
+  flex-wrap: wrap;
+}
+.scene-actions > button {
+  flex: 1 1 140px;
+}
+.view {
+  min-height: calc(100dvh - 320px);
+  padding-bottom: 12px;
+}
+.modal {
+  align-items: flex-end;
+}
+@media (max-width: 640px) {
+  .building-grid, .roster-grid, .stage-list {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .building-card, .disciple-card {
+    min-height: 0;
+    padding: 12px;
+  }
+  .lineup-slots {
+    grid-template-columns: 1fr 1fr;
+  }
+  .formation-results, .summon-results {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/* Phone frame page only */
+.phone-frame-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #0a1011;
+  padding: 24px 12px;
+  font-family: "Microsoft YaHei", sans-serif;
+  color: #e9e1cf;
+}
+.phone-chrome {
+  width: min(390px, 100%);
+  border: 10px solid #1c2426;
+  border-radius: 36px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 0 0 2px #2d3a3c;
+  background: #000;
+  overflow: hidden;
+  position: relative;
+}
+.phone-chrome::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 96px;
+  height: 18px;
+  border-radius: 12px;
+  background: #111;
+  z-index: 5;
+}
+.phone-chrome iframe {
+  display: block;
+  width: 100%;
+  height: 780px;
+  border: 0;
+  background: #111a1c;
+}
+.phone-caption {
+  margin-top: 16px;
+  text-align: center;
+  color: #9fa9a3;
+  font-size: 14px;
+}
