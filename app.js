@@ -47,6 +47,9 @@
     el("#scene-eyebrow").textContent = `青崖山南麓 · 第${state.day}日 · 秘境第${state.currentCycle}轮`;
     el("#goal-card").innerHTML = goalMarkup();
     document.querySelectorAll(".main-nav button").forEach((button) => button.classList.toggle("active", button.dataset.tab === activeTab));
+    const scene = el(".scene-panel");
+    if (scene) scene.hidden = activeTab !== "sect";
+    document.body.classList.toggle("tab-sect", activeTab === "sect");
     if (state.currentCycle > 1) { el("#scene-title").textContent = "灵潮复起，道阻且长"; el("#scene-text").textContent = `墨蛟虽伏，秘境已进入第${state.currentCycle}轮。更强的敌人和更丰厚的资源正在山下重生。`; }
     else if (state.sectLevel > 1) { el("#scene-title").textContent = "青崖门，今日重立"; el("#scene-text").textContent = "屋瓦仍旧，门下的人心却已经不同。下一步，是取回墨蛟潭中的宗门旧印。"; }
   }
@@ -54,7 +57,7 @@
     renderChrome();
     const tabs = { sect: renderSect, disciples: renderDisciples, recruit: renderRecruit, expedition: renderExpedition, chronicle: renderChronicle };
     (tabs[activeTab] || renderSect)();
-    view.insertAdjacentHTML("afterbegin", guidePanel());
+    if (activeTab === "sect") view.insertAdjacentHTML("afterbegin", guidePanel());
   }
   function header(title, subtitle, aside = "") { return `<div class="view-header"><div><h2>${title}</h2><p>${subtitle}</p></div>${aside}</div>`; }
   function portrait(d, className = "portrait") { return `<div class="${className}"><img src="${d.portrait}" alt="${d.name}人物形象"></div>`; }
@@ -176,7 +179,7 @@
   function openStory() {
     showModal(`<div class="modal-card"><div class="story-seal">残</div><h2>掌门印</h2><p>门下三人都只是炼气一层。若想筑基，要走完十四层小境界，还要攒出筑基资源。青石坊七日后上山收债，而南麓秘境正在重生。</p><button class="primary-button" data-action="close-modal">从炼气一层开始</button></div>`);
   }
-  function setTab(tab) { activeTab = tab; activeBattle = null; render(); window.scrollTo({ top: Math.max(0, el(".main-nav").offsetTop - 80), behavior: "smooth" }); }
+  function setTab(tab) { activeTab = tab; activeBattle = null; render(); window.scrollTo({ top: 0, behavior: "instant" in document.documentElement.style ? "instant" : "auto" }); }
 
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-action]"); if (!button || button.disabled) return;

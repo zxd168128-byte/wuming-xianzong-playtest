@@ -158,3 +158,18 @@ body {
   color: #9fa9a3;
   font-size: 14px;
 }
+
+/* Non-sect tabs: reclaim the hero banner space */
+.scene-panel[hidden] { display: none !important; }
+body:not(.tab-sect) .view {
+  min-height: calc(100dvh - 140px);
+  padding-top: 8px;
+}
+body:not(.tab-sect) .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(10, 18, 19, .96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(233, 225, 207, .08);
+}
