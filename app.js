@@ -2,7 +2,7 @@
   const D = window.SectData, C = window.SectCore;
   const SAVE_KEY = "immortal-sect-v04-save";
   const RESOURCE_NAMES = { stone: "灵石", wood: "灵木", herbs: "灵药", food: "灵粮", seals: "寻仙令", jade: "灵玉", fateSeals: "通用命印", fateDust: "天命尘", renown: "声望", debt: "债务" };
-  let state = loadState(), activeTab = "sect", recruitMode = "characters", selectedDisciple = "fang-yan", activeBattle = null, selectedTactic = "balanced", toastTimer = null;
+  let state = loadState(), activeTab = "sect", recruitMode = "characters", selectedDisciple = "fang-yan", activeBattle = null, selectedTactic = "assault", toastTimer = null;
   const el = (selector) => document.querySelector(selector), view = el("#view");
 
   function loadState() {
@@ -23,7 +23,7 @@
   }
   function ownedCount() { return Object.values(state.roster).filter((d) => d.owned).length; }
   function resourceMarkup() {
-    return ["stone", "wood", "herbs", "food", "seals", "jade"].map((key) => `<div class="resource"><span>${RESOURCE_NAMES[key]}</span><b>${state.resources[key]}</b></div>`).join("");
+    return ["stone", "seals", "jade", "wood", "herbs", "food"].map((key) => `<div class="resource"><span>${RESOURCE_NAMES[key]}</span><b>${state.resources[key]}</b></div>`).join("");
   }
   function goalMarkup() {
     const steps = ["收取一次灵息", "让任意弟子修炼一次", "完成一次免费招贤", "点亮任意弟子命星", "赢得雾林入口首战"];
@@ -33,11 +33,11 @@
   function guidePanel() {
     if (state.tutorial.complete) return "";
     const guides = [
-      ["第一课 · 聚拢资源", "先收取山门积存的灵息。", "claim", "收取灵息"],
-      ["第二课 · 打磨根骨", "选择方砚，让他完成一次闭关修炼。", "guide-tab", "前往弟子", "disciples"],
-      ["第三课 · 广纳门徒", "仙缘阁每日有一次免费招贤。", "guide-tab", "前往仙缘阁", "recruit"],
-      ["第四课 · 点亮命星", "刚获得的天命印可替代一次重复本体。", "guide-tab", "查看弟子命星", "disciples"],
-      ["第五课 · 初入秘境", "带三名弟子扫清雾林入口。", "guide-tab", "开始首战", "expedition"]
+      ["第一课 · 聚拢资源", "先点『收取灵息』，把山门积存收进库房。", "claim", "收取灵息"],
+      ["第二课 · 打磨根骨", "点选方砚卡片，再点『闭关修炼』。", "guide-tab", "前往弟子", "disciples"],
+      ["第三课 · 广纳门徒", "仙缘阁每日有一次免费招贤，点顶部主按钮即可。", "guide-tab", "前往仙缘阁", "recruit"],
+      ["第四课 · 点亮命星", "点『激活命印』（教程已送通用命印）。", "guide-tab", "查看弟子命星", "disciples"],
+      ["第五课 · 初入秘境", "先确认前排有守御，再点雾林入口『进入』。", "guide-tab", "开始首战", "expedition"]
     ];
     const g = guides[state.tutorial.step];
     return `<section class="guide-panel"><span>掌门指引</span><div><b>${g[0]}</b><p>${g[1]}</p></div><button class="primary-button" data-action="${g[2]}" ${g[4] ? `data-tab="${g[4]}"` : ""}>${g[3]}</button></section>`;
@@ -52,12 +52,12 @@
     document.body.classList.toggle("tab-sect", activeTab === "sect");
     if (state.currentCycle > 1) { el("#scene-title").textContent = "灵潮复起，道阻且长"; el("#scene-text").textContent = `墨蛟虽伏，秘境已进入第${state.currentCycle}轮。更强的敌人和更丰厚的资源正在山下重生。`; }
     else if (state.sectLevel > 1) { el("#scene-title").textContent = "青崖门，今日重立"; el("#scene-text").textContent = "屋瓦仍旧，门下的人心却已经不同。下一步，是取回墨蛟潭中的宗门旧印。"; }
+    const host = el("#guide-host"); if (host) host.innerHTML = guidePanel();
   }
   function render() {
     renderChrome();
     const tabs = { sect: renderSect, disciples: renderDisciples, recruit: renderRecruit, expedition: renderExpedition, chronicle: renderChronicle };
     (tabs[activeTab] || renderSect)();
-    if (activeTab === "sect") view.insertAdjacentHTML("afterbegin", guidePanel());
   }
   function header(title, subtitle, aside = "") { return `<div class="view-header"><div><h2>${title}</h2><p>${subtitle}</p></div>${aside}</div>`; }
   function portrait(d, className = "portrait") { return `<div class="${className}"><img src="${d.portrait}" alt="${d.name}人物形象"></div>`; }
@@ -101,12 +101,13 @@
   }
 
   function renderRecruit() {
-    const tabs = `<div class="recruit-tabs"><button class="${recruitMode === "characters" ? "active" : ""}" data-action="recruit-mode" data-mode="characters">弟子仙缘</button><button class="${recruitMode === "formations" ? "active" : ""}" data-action="recruit-mode" data-mode="formations">阵图参悟</button><button class="${recruitMode === "shop" ? "active" : ""}" data-action="recruit-mode" data-mode="shop">仙坊</button></div>`;
+    const tabs = `<div class="recruit-tabs"><button class="${recruitMode === "characters" ? "active" : ""}" data-action="recruit-mode" data-mode="characters">弟子仙缘</button><button class="${recruitMode === "formations" ? "active" : ""}" data-action="recruit-mode" data-mode="formations">阵图参悟</button><button class="${recruitMode === "shop" ? "active" : ""}" data-action="recruit-mode" data-mode="shop">仙坊·购</button></div>`;
     if (recruitMode === "formations") { renderFormationRecruit(tabs); return; }
     if (recruitMode === "shop") { renderShop(tabs); return; }
     const usedFree = state.lastFreeRecruitKey === new Date().toISOString().slice(0, 10);
     const featured = D.disciples.find((d) => d.id === D.banner.featured);
-    view.innerHTML = `${header("仙缘阁", "付费人物池只含SR以上；UR靠机制与阵法兼容成为核心拼图。")}${tabs}
+    const freeTop = !usedFree ? `<section class="free-recruit-top paper-panel"><div><span class="section-kicker">今日福利</span><h3>免费招贤尚未领取</h3><p>教程第三课：先拿今日免费一次，再考虑付费寻缘。</p></div><button class="primary-button" data-action="free-recruit">今日免费招贤</button></section>` : "";
+    view.innerHTML = `${header("仙缘阁", "付费人物池只含SR以上；UR靠机制与阵法兼容成为核心拼图。")}${tabs}${freeTop}
       <section class="limited-banner paper-panel"><img src="${featured.portrait}" alt="${featured.name}"><div><span class="section-kicker">限时仙缘 · 雷异灵根</span><h2>${D.banner.name}</h2><h3>UR ${featured.name} · 天雷道骨</h3><p>${featured.talentText}</p><div class="tag-row">${featured.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}</div><small>战斗为雷属性，不参与五行克制；阵法判定可视为金或水。</small></div><div class="summon-controls"><div class="resource"><span>持有灵玉</span><b>${state.resources.jade}</b></div><div class="rate-list"><div><b>82%</b><small>SR</small></div><div><b>15%</b><small>SSR</small></div><div><b>3%</b><small>UR</small></div></div><button class="ink-button" data-action="limited-recruit" data-count="1" ${state.resources.jade < 160 ? "disabled" : ""}>结缘一次 · 160</button><button class="primary-button" data-action="limited-recruit" data-count="10" ${state.resources.jade < 1600 ? "disabled" : ""}>十方寻缘 · 1600</button><small>UR保底 ${state.limitedPity}/60 · ${state.featuredGuaranteed ? "下个UR必为当期" : "首次UR有50%为当期"} · 最差120抽</small></div></section>
       <section class="summon-hall paper-panel"><div class="summon-visual"><h2>山门常驻招贤</h2><p>普通门人从经营与事件获得；寻仙池只投放SR、SSR、UR。满命后的重复会自动化为天命尘。</p></div><div class="summon-controls"><div class="resource"><span>寻仙令 / 天命尘</span><b>${state.resources.seals} / ${state.resources.fateDust}</b></div><div class="rate-list"><div><b>82%</b><small>SR</small></div><div><b>15%</b><small>SSR</small></div><div><b>3%</b><small>UR</small></div></div><button class="ink-button" data-action="free-recruit" ${usedFree ? "disabled" : ""}>${usedFree ? "今日免费招贤已用" : "今日免费招贤"}</button><button class="ink-button" data-action="recruit" data-count="1" ${state.resources.seals < 1 ? "disabled" : ""}>招贤一次 · 1令</button><button class="primary-button" data-action="recruit" data-count="10" ${state.resources.seals < 10 ? "disabled" : ""}>十方寻缘 · 10令</button><small>常驻UR保底 ${state.urPity}/60；抽到UR后重置。</small></div></section>`;
   }
@@ -117,7 +118,7 @@
 
   function renderShop(tabs) {
     const monthlyClaimed = state.lastMonthlyClaimKey === new Date().toISOString().slice(0, 10);
-    view.innerHTML = `${header("仙坊", "当前为试玩购买：点击后模拟到账，不连接真实支付。")}${tabs}<section class="first-charge paper-panel"><div><span class="section-kicker">首次任意购买</span><h2>首充礼 · 宁红绡</h2><p>立即获得SSR宁红绡（已拥有则获得专属命印）及10枚寻仙令。每档灵玉首购另享双倍。</p></div><button class="${state.firstPurchaseClaimed ? "ink-button" : "primary-button"}" disabled>${state.firstPurchaseClaimed ? "首充礼已领取" : "购买任意商品自动领取"}</button></section>${state.monthlyDays > 0 ? `<section class="monthly-claim paper-panel"><div><span class="section-kicker">洞天月契生效中</span><h3>余 ${state.monthlyDays} 次每日供奉</h3><p>领取90灵玉；月契期间离线积存上限由8小时提高到12小时。</p></div><button class="primary-button" data-action="claim-monthly" ${monthlyClaimed ? "disabled" : ""}>${monthlyClaimed ? "今日已领取" : "领取今日90灵玉"}</button></section>` : ""}<div class="shop-grid">${D.shopItems.map((item) => { const bought = state.purchases[item.id] || 0, firstDouble = item.type === "jade" && !bought; return `<article class="paper-panel"><span>${item.type === "jade" ? "灵玉充值" : item.type === "monthly" ? "月度权益" : "限购礼包"}</span><h3>${item.name}</h3><strong>${item.price}</strong><p>${item.type === "jade" ? `${item.jade}灵玉${firstDouble ? ` + 首购赠${item.jade}` : ""}` : item.type === "monthly" ? "立即300灵玉；30次每日90灵玉；离线收益上限+4小时" : costText(item.rewards)}</p><button class="small-button" data-action="purchase" data-id="${item.id}" ${!item.repeatable && bought ? "disabled" : ""}>${!item.repeatable && bought ? "已购买" : `试玩购买 ${item.price}`}</button></article>`; }).join("")}</div><section class="dust-shop paper-panel"><div><span class="section-kicker">满命回收</span><h3>天命尘 ${state.resources.fateDust}</h3><p>SR/SSR/UR满命后的重复分别转10/40/100天命尘。</p></div><button data-action="dust-exchange" data-id="fate">通用命印<small>200尘</small></button><button data-action="dust-exchange" data-id="ticket">寻仙令×10<small>80尘</small></button>${["wood", "herbs", "food", "stone"].map((key) => `<button data-action="dust-exchange" data-id="${key}">${RESOURCE_NAMES[key]}6小时<small>60尘</small></button>`).join("")}</section>`;
+    view.innerHTML = `${header("仙坊", "当前为试玩购买：点击后模拟到账，不连接真实支付。")}${tabs}<section class="first-charge paper-panel"><div><span class="section-kicker">首次任意购买</span><h2>首充礼 · 宁红绡</h2><p>立即获得SSR宁红绡（已拥有则获得专属命印）及10枚寻仙令。每档灵玉首购另享双倍。</p></div><span class="first-charge-badge ${state.firstPurchaseClaimed ? "claimed" : ""}">${state.firstPurchaseClaimed ? "首充礼已领取" : "购买任意商品自动领取"}</span></section>${state.monthlyDays > 0 ? `<section class="monthly-claim paper-panel"><div><span class="section-kicker">洞天月契生效中</span><h3>余 ${state.monthlyDays} 次每日供奉</h3><p>领取90灵玉；月契期间离线积存上限由8小时提高到12小时。</p></div><button class="primary-button" data-action="claim-monthly" ${monthlyClaimed ? "disabled" : ""}>${monthlyClaimed ? "今日已领取" : "领取今日90灵玉"}</button></section>` : ""}<div class="shop-grid">${D.shopItems.map((item) => { const bought = state.purchases[item.id] || 0, firstDouble = item.type === "jade" && !bought; return `<article class="paper-panel"><span>${item.type === "jade" ? "灵玉充值" : item.type === "monthly" ? "月度权益" : "限购礼包"}</span><h3>${item.name}</h3><strong>${item.price}</strong><p>${item.type === "jade" ? `${item.jade}灵玉${firstDouble ? ` + 首购赠${item.jade}` : ""}` : item.type === "monthly" ? "立即300灵玉；30次每日90灵玉；离线收益上限+4小时" : costText(item.rewards)}</p><button class="small-button" data-action="purchase" data-id="${item.id}" ${!item.repeatable && bought ? "disabled" : ""}>${!item.repeatable && bought ? "已购买" : `试玩购买 ${item.price}`}</button></article>`; }).join("")}</div><section class="dust-shop paper-panel"><div><span class="section-kicker">满命回收</span><h3>天命尘 ${state.resources.fateDust}</h3><p>SR/SSR/UR满命后的重复分别转10/40/100天命尘。</p></div><button data-action="dust-exchange" data-id="fate">通用命印<small>200尘</small></button><button data-action="dust-exchange" data-id="ticket">寻仙令×10<small>80尘</small></button>${["wood", "herbs", "food", "stone"].map((key) => `<button data-action="dust-exchange" data-id="${key}">${RESOURCE_NAMES[key]}6小时<small>60尘</small></button>`).join("")}</section>`;
   }
 
   function formationPanel() {
@@ -147,11 +148,17 @@
   function battleMarkup() {
     const formation = D.formations.find((f) => f.id === activeBattle.formationId);
     const tactics = [{ id: "assault", name: "强攻", text: "伤害+25%，受伤+10%" }, { id: "guard", name: "守势", text: "伤害-14%，受伤-38%" }, { id: "charge", name: "蓄灵", text: "伤害-18%，回灵+20" }];
-    return `<div class="battlefield"><section class="combat-side paper-panel"><h3>门下弟子 · ${activeBattle.players.length}人</h3>${unitRows(activeBattle.players)}</section><section class="combat-log paper-panel"><span class="intent">${enemyIntent()}</span><h3>${D.stages[activeBattle.stageId].name} · 第${activeBattle.round}轮</h3>${activeBattle.players.some((u) => u.skillType === "thunder") ? `<div class="thunder-marks">雷印 ${"●".repeat(activeBattle.thunderMarks)}${"○".repeat(5 - activeBattle.thunderMarks)}</div>` : ""}${activeBattle.log.map((line) => `<p>${line}</p>`).join("")}</section><section class="combat-side paper-panel"><h3>秘境敌人</h3>${unitRows(activeBattle.enemies)}${activeBattle.finished ? `<div class="battle-actions"><button class="primary-button" data-action="settle" ${activeBattle.victory ? "" : "disabled"}>${activeBattle.victory ? "领取奖励" : "整备后再战"}</button><button class="ink-button" data-action="leave-battle">返回</button></div>` : `<div class="tactic-picker">${tactics.map((t) => `<button class="${selectedTactic === t.id ? "active" : ""}" data-action="tactic" data-id="${t.id}"><b>${t.name}</b><small>${t.text}</small></button>`).join("")}</div><button class="formation-active" data-action="formation-active" ${activeBattle.formationReady ? "" : "disabled"}>阵法 · ${formation.active}${activeBattle.formationReady ? `（适配${activeBattle.formationCount}人）` : "（已用）"}</button><button class="formation-active master" data-action="master-skill" ${activeBattle.masterReady ? "" : "disabled"}>掌门技 · 清心令${activeBattle.masterReady ? "" : "（已用）"}</button><div class="battle-actions"><button class="primary-button" data-action="battle-round">执行本轮</button><button class="ink-button" data-action="auto-battle">按当前战术自动</button></div>`}</section></div>`;
+    return `<div class="battlefield"><section class="combat-side paper-panel"><h3>门下弟子 · ${activeBattle.players.length}人</h3>${unitRows(activeBattle.players)}</section><section class="combat-log paper-panel"><span class="intent">${enemyIntent()}</span><h3>${D.stages[activeBattle.stageId].name} · 第${activeBattle.round}轮</h3>${activeBattle.players.some((u) => u.skillType === "thunder") ? `<div class="thunder-marks">雷印 ${"●".repeat(activeBattle.thunderMarks)}${"○".repeat(5 - activeBattle.thunderMarks)}</div>` : ""}${activeBattle.log.map((line) => `<p>${line}</p>`).join("")}</section><section class="combat-side paper-panel"><h3>秘境敌人</h3>${unitRows(activeBattle.enemies)}${activeBattle.finished ? `<div class="combat-dock"><div class="battle-actions"><button class="primary-button" data-action="settle" ${activeBattle.victory ? "" : "disabled"}>${activeBattle.victory ? "领取奖励" : "整备后再战"}</button><button class="ink-button" data-action="leave-battle">返回</button></div></div>` : `<div class="combat-dock"><div class="tactic-picker">${tactics.map((t) => `<button class="${selectedTactic === t.id ? "active" : ""}" data-action="tactic" data-id="${t.id}"><b>${t.name}</b><small>${t.text}</small></button>`).join("")}</div><button class="formation-active" data-action="formation-active" ${activeBattle.formationReady ? "" : "disabled"}>阵法 · ${formation.active}${activeBattle.formationReady ? `（适配${activeBattle.formationCount}人）` : "（已用）"}</button><button class="formation-active master" data-action="master-skill" ${activeBattle.masterReady ? "" : "disabled"}>掌门技 · 清心令${activeBattle.masterReady ? "" : "（已用）"}</button><div class="battle-actions"><button class="primary-button" data-action="battle-round">执行本轮</button><button class="ink-button" data-action="auto-battle">按当前战术自动</button></div></div>`}</section></div>`;
   }
   function renderExpedition() {
     if (activeBattle) { view.innerHTML = `${header("秘境交锋", "每轮先看敌方预兆，再选择强攻、守势或蓄灵；阵术每场只能使用一次。")}${battleMarkup()}`; return; }
-    view.innerHTML = `${header("残碑秘境", `当前第${state.currentCycle}轮 · 累计胜利${state.expeditionWins}次。Boss后秘境会重启，不再一次性消失。`)}<div class="stage-list">${stageCards()}</div>${partyPicker()}${formationPanel()}`;
+    const prioritizePrep = !state.tutorial.complete || state.expeditionProgress === 0;
+    const startTop = prioritizePrep && state.expeditionProgress === 0
+      ? `<section class="expedition-start-top paper-panel"><div><span class="section-kicker">首战准备</span><h3>先核对编队，再挑战雾林入口</h3><p>前三位为前排；建议至少1名守御后再开战。</p></div><button class="primary-button" data-action="start-battle" data-id="0">挑战雾林入口</button></section>`
+      : "";
+    const prep = `${partyPicker()}${formationPanel()}`;
+    const stages = `<div class="stage-list">${stageCards()}</div>`;
+    view.innerHTML = `${header("残碑秘境", `当前第${state.currentCycle}轮 · 累计胜利${state.expeditionWins}次。Boss后秘境会重启，不再一次性消失。`)}${prioritizePrep ? `${startTop}${prep}${stages}` : `${stages}${prep}`}`;
   }
 
   function renderChronicle() {
@@ -177,7 +184,7 @@
     showModal(`<div class="modal-card breakthrough-card"><div class="breakthrough-portrait"><img src="${disciple.portrait}" alt="${disciple.name}"></div><div class="story-seal">破</div><h2>${disciple.name} · ${realm.name}</h2><p>${major ? "灵气冲开桎梏，山中风声骤歇。大境界之前没有侥幸，只有积累。" : "经脉再拓一层，离筑基仍有漫长路途。"}</p><button class="primary-button" data-action="close-modal">记入宗门谱</button></div>`);
   }
   function openStory() {
-    showModal(`<div class="modal-card"><div class="story-seal">残</div><h2>掌门印</h2><p>门下三人都只是炼气一层。若想筑基，要走完十四层小境界，还要攒出筑基资源。青石坊七日后上山收债，而南麓秘境正在重生。</p><button class="primary-button" data-action="close-modal">从炼气一层开始</button></div>`);
+    showModal(`<div class="modal-card"><div class="story-seal">残</div><h2>掌门印</h2><p>门下三人都只是炼气一层。若想筑基，要走完十四层小境界，还要攒出筑基资源。青石坊七日后上山收债，而南麓秘境正在重生。</p><button class="primary-button" data-action="close-modal">开始：先去收取灵息</button></div>`);
   }
   function setTab(tab) { activeTab = tab; activeBattle = null; render(); window.scrollTo({ top: 0, behavior: "instant" in document.documentElement.style ? "instant" : "auto" }); }
 
@@ -217,7 +224,7 @@
     }
     if (action === "recommend-party") commit(C.recommendParty(state, button.dataset.style));
     if (action === "formation") commit(C.setFormation(state, button.dataset.id));
-    if (action === "start-battle") { activeBattle = C.createBattle(state, Number(button.dataset.id)); if (!activeBattle) toast("请先配置三名已入门弟子。"); selectedTactic = "balanced"; renderExpedition(); }
+    if (action === "start-battle") { activeBattle = C.createBattle(state, Number(button.dataset.id)); if (!activeBattle) toast("请先配置三名已入门弟子。"); if (!["assault", "guard", "charge"].includes(selectedTactic)) selectedTactic = "assault"; renderExpedition(); }
     if (action === "tactic") { selectedTactic = button.dataset.id; renderExpedition(); }
     if (action === "formation-active") { activeBattle = C.useFormationActive(activeBattle); renderExpedition(); }
     if (action === "master-skill") { activeBattle = C.useMasterSkill(activeBattle); renderExpedition(); }

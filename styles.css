@@ -48,9 +48,10 @@ main { padding: 18px 24px 40px; }
 .scene-copy h1 { margin: 0 0 12px; font-size: clamp(2rem, 4.4vw, 4.2rem); font-weight: 500; letter-spacing: .08em; line-height: 1.1; text-shadow: 0 4px 18px #000; }
 .scene-copy > p:not(.eyebrow) { margin: 0; color: #c8ccc4; font-size: .95rem; line-height: 1.8; max-width: 46ch; }
 .scene-actions { display: flex; gap: 10px; margin-top: 21px; }
-.goal-card { position: absolute; right: 22px; bottom: 20px; width: 260px; padding: 14px 16px; border: 1px solid var(--line); background: rgba(12,21,22,.84); backdrop-filter: blur(10px); border-radius: 4px; }
-.goal-card strong { display: block; margin-bottom: 7px; color: var(--gold); font-size: .82rem; letter-spacing: .12em; }
-.goal-card p { margin: 0; font-size: .84rem; color: #c1c8c2; line-height: 1.55; }
+.goal-card { margin: 8px 16px 0; padding: 10px 14px; border: 1px solid var(--line); background: rgba(12,21,22,.9); backdrop-filter: blur(10px); border-radius: 4px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; }
+.goal-card strong { display: block; margin-bottom: 2px; color: var(--gold); font-size: .78rem; letter-spacing: .1em; }
+.goal-card p { margin: 0; font-size: .78rem; color: #c1c8c2; line-height: 1.4; grid-column: 1 / -1; }
+.goal-card .goal-meter { grid-column: 1 / -1; }
 .goal-meter { height: 4px; margin-top: 11px; background: rgba(255,255,255,.09); overflow: hidden; }
 .goal-meter span { display: block; height: 100%; background: var(--jade); }
 .main-nav { margin: 16px 0; display: grid; grid-template-columns: repeat(5, 1fr); background: rgba(17,29,30,.86); border: 1px solid var(--line); }
@@ -257,6 +258,8 @@ main { padding: 18px 24px 40px; }
 .production-rates em { margin-left: 7px; color: var(--jade-bright); font-style: normal; }
 .build-cost { min-height: 34px; margin: 2px 0 8px; color: #c6b98f; font-size: .68rem; line-height: 1.45; }
 .supply-button { width: 100%; margin-top: 6px; padding: 7px; border: 1px dashed rgba(198,167,106,.5); color: var(--gold); background: rgba(198,167,106,.06); cursor: pointer; font-size: .72rem; }
+.first-charge-badge { display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; border: 1px solid rgba(198,167,106,.45); border-radius: 4px; color: #ead8aa; background: rgba(38,35,26,.7); font-size: .78rem; white-space: nowrap; }
+.first-charge-badge.claimed { color: var(--muted); border-color: var(--line); }
 .resource-choice, .monthly-claim, .first-charge { margin-top: 12px; padding: 18px; display: flex; align-items: center; gap: 9px; }
 .resource-choice > div, .monthly-claim > div, .first-charge > div { flex: 1; }
 .resource-choice h3, .monthly-claim h3, .first-charge h2 { margin: 4px 0; font-weight: 500; }
@@ -325,7 +328,6 @@ main { padding: 18px 24px 40px; }
   .resource-strip { grid-column: 1 / -1; order: 3; padding-bottom: 2px; }
   .building-grid, .roster-grid { grid-template-columns: repeat(3, 1fr); }
   .stage-list { grid-template-columns: repeat(2, 1fr); }
-  .goal-card { display: none; }
   .scene-copy { width: 74%; }
   .battlefield { grid-template-columns: 1fr 1fr; }
   .combat-log { grid-column: 1 / -1; }
