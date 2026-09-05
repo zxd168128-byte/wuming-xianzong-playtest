@@ -53,7 +53,7 @@ main { padding: 18px 24px 40px; }
 .goal-card p { margin: 0; font-size: .84rem; color: #c1c8c2; line-height: 1.55; }
 .goal-meter { height: 4px; margin-top: 11px; background: rgba(255,255,255,.09); overflow: hidden; }
 .goal-meter span { display: block; height: 100%; background: var(--jade); }
-.main-nav { margin: 16px 0; display: grid; grid-template-columns: repeat(6, 1fr); background: rgba(17,29,30,.86); border: 1px solid var(--line); }
+.main-nav { margin: 16px 0; display: grid; grid-template-columns: repeat(5, 1fr); background: rgba(17,29,30,.86); border: 1px solid var(--line); }
 .main-nav button { min-height: 62px; border: 0; border-right: 1px solid var(--line); color: var(--muted); background: transparent; cursor: pointer; font-size: .9rem; }
 .main-nav button:last-child { border-right: 0; }
 .main-nav button span { display: inline-grid; place-items: center; width: 29px; height: 29px; margin-right: 7px; border: 1px solid var(--line); color: var(--paper); transform: rotate(45deg); }
@@ -338,16 +338,29 @@ main { padding: 18px 24px 40px; }
 }
 
 @media (max-width: 640px) {
-  .topbar { padding: 9px 12px; }
+  .topbar { padding: 8px 10px; gap: 8px; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .brand { min-width: 0; flex: 1; gap: 8px; }
+  .brand strong { font-size: .92rem; letter-spacing: .08em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 11em; }
+  .brand small { font-size: .68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brand-seal { width: 34px; height: 34px; flex: 0 0 auto; }
+  .quiet-button { padding: 8px 10px; flex: 0 0 auto; }
+  .resource-strip { gap: 5px; }
+  .resource { padding: 4px 7px; gap: 4px; }
+  .resource span { font-size: .66rem; }
+  .resource b { font-size: .78rem; }
   main { padding: 10px 10px 28px; }
-  .scene-panel { min-height: 330px; }
-  .scene-copy { width: calc(100% - 34px); left: 17px; top: auto; bottom: 20px; transform: none; }
-  .scene-copy h1 { font-size: 2rem; }
+  .scene-panel { min-height: 210px; max-height: 38vh; }
+  .scene-copy { width: calc(100% - 28px); left: 14px; top: auto; bottom: 14px; transform: none; }
+  .scene-copy h1 { font-size: 1.45rem; margin-bottom: 6px; }
+  .scene-copy > p:not(.eyebrow) { font-size: .82rem; line-height: 1.45; max-width: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .scene-actions { margin-top: 10px; gap: 8px; }
   .scene-shade { background: linear-gradient(0deg, rgba(7,13,14,.94) 0, rgba(7,13,14,.48) 70%, transparent); }
-  body { padding-bottom: 66px; }
-  .main-nav { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 40; margin: 0; background: rgba(10,18,19,.97); backdrop-filter: blur(14px); }
-  .main-nav button { font-size: .72rem; min-height: 53px; }
-  .main-nav button span { display: block; margin: 0 auto 3px; width: 22px; height: 22px; font-size: .7rem; }
+  body { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+  .toast { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
+  .main-nav { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 40; margin: 0; grid-template-columns: repeat(5, 1fr); background: rgba(10,18,19,.97); backdrop-filter: blur(14px); border-left: 0; border-right: 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .main-nav button { font-size: .68rem; min-height: 58px; padding: 6px 2px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; letter-spacing: 0; line-height: 1.15; }
+  .main-nav button span { display: grid; place-items: center; margin: 0; width: 24px; height: 24px; font-size: .72rem; transform: rotate(45deg); }
+  .main-nav button span::first-letter { transform: rotate(-45deg); display: inline-block; }
   .building-grid, .roster-grid, .stage-list { grid-template-columns: repeat(2, 1fr); }
   .detail-layout, .summon-hall, .chronicle, .battlefield, .limited-banner, .shop-preview { grid-template-columns: 1fr; }
   .summon-controls { border-left: 0; border-top: 1px solid var(--line); }

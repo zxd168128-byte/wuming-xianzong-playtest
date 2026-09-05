@@ -1,8 +1,8 @@
 (function () {
-  const D = window.SectData, C = window.SectCore, Combat = window.SectCombat05A;
+  const D = window.SectData, C = window.SectCore;
   const SAVE_KEY = "immortal-sect-v04-save";
   const RESOURCE_NAMES = { stone: "灵石", wood: "灵木", herbs: "灵药", food: "灵粮", seals: "寻仙令", jade: "灵玉", fateSeals: "通用命印", fateDust: "天命尘", renown: "声望", debt: "债务" };
-  let state = loadState(), activeTab = "sect", recruitMode = "characters", selectedDisciple = "fang-yan", activeBattle = null, selectedTactic = "balanced", toastTimer = null, sandboxBattle = null, sandboxPreset = "balanced", sandboxSeed = 20260905;
+  let state = loadState(), activeTab = "sect", recruitMode = "characters", selectedDisciple = "fang-yan", activeBattle = null, selectedTactic = "balanced", toastTimer = null;
   const el = (selector) => document.querySelector(selector), view = el("#view");
 
   function loadState() {
@@ -52,7 +52,8 @@
   }
   function render() {
     renderChrome();
-    ({ sect: renderSect, disciples: renderDisciples, recruit: renderRecruit, expedition: renderExpedition, sandbox: renderSandbox, chronicle: renderChronicle })[activeTab]();
+    const tabs = { sect: renderSect, disciples: renderDisciples, recruit: renderRecruit, expedition: renderExpedition, chronicle: renderChronicle };
+    (tabs[activeTab] || renderSect)();
     view.insertAdjacentHTML("afterbegin", guidePanel());
   }
   function header(title, subtitle, aside = "") { return `<div class="view-header"><div><h2>${title}</h2><p>${subtitle}</p></div>${aside}</div>`; }
@@ -113,7 +114,7 @@
 
   function renderShop(tabs) {
     const monthlyClaimed = state.lastMonthlyClaimKey === new Date().toISOString().slice(0, 10);
-    view.innerHTML = `${header("仙坊", "当前为沙盒购买：点击后模拟到账，不连接真实支付。")}${tabs}<section class="first-charge paper-panel"><div><span class="section-kicker">首次任意购买</span><h2>首充礼 · 宁红绡</h2><p>立即获得SSR宁红绡（已拥有则获得专属命印）及10枚寻仙令。每档灵玉首购另享双倍。</p></div><button class="${state.firstPurchaseClaimed ? "ink-button" : "primary-button"}" disabled>${state.firstPurchaseClaimed ? "首充礼已领取" : "购买任意商品自动领取"}</button></section>${state.monthlyDays > 0 ? `<section class="monthly-claim paper-panel"><div><span class="section-kicker">洞天月契生效中</span><h3>余 ${state.monthlyDays} 次每日供奉</h3><p>领取90灵玉；月契期间离线积存上限由8小时提高到12小时。</p></div><button class="primary-button" data-action="claim-monthly" ${monthlyClaimed ? "disabled" : ""}>${monthlyClaimed ? "今日已领取" : "领取今日90灵玉"}</button></section>` : ""}<div class="shop-grid">${D.shopItems.map((item) => { const bought = state.purchases[item.id] || 0, firstDouble = item.type === "jade" && !bought; return `<article class="paper-panel"><span>${item.type === "jade" ? "灵玉充值" : item.type === "monthly" ? "月度权益" : "限购礼包"}</span><h3>${item.name}</h3><strong>${item.price}</strong><p>${item.type === "jade" ? `${item.jade}灵玉${firstDouble ? ` + 首购赠${item.jade}` : ""}` : item.type === "monthly" ? "立即300灵玉；30次每日90灵玉；离线收益上限+4小时" : costText(item.rewards)}</p><button class="small-button" data-action="purchase" data-id="${item.id}" ${!item.repeatable && bought ? "disabled" : ""}>${!item.repeatable && bought ? "已购买" : `沙盒购买 ${item.price}`}</button></article>`; }).join("")}</div><section class="dust-shop paper-panel"><div><span class="section-kicker">满命回收</span><h3>天命尘 ${state.resources.fateDust}</h3><p>SR/SSR/UR满命后的重复分别转10/40/100天命尘。</p></div><button data-action="dust-exchange" data-id="fate">通用命印<small>200尘</small></button><button data-action="dust-exchange" data-id="ticket">寻仙令×10<small>80尘</small></button>${["wood", "herbs", "food", "stone"].map((key) => `<button data-action="dust-exchange" data-id="${key}">${RESOURCE_NAMES[key]}6小时<small>60尘</small></button>`).join("")}</section>`;
+    view.innerHTML = `${header("仙坊", "当前为试玩购买：点击后模拟到账，不连接真实支付。")}${tabs}<section class="first-charge paper-panel"><div><span class="section-kicker">首次任意购买</span><h2>首充礼 · 宁红绡</h2><p>立即获得SSR宁红绡（已拥有则获得专属命印）及10枚寻仙令。每档灵玉首购另享双倍。</p></div><button class="${state.firstPurchaseClaimed ? "ink-button" : "primary-button"}" disabled>${state.firstPurchaseClaimed ? "首充礼已领取" : "购买任意商品自动领取"}</button></section>${state.monthlyDays > 0 ? `<section class="monthly-claim paper-panel"><div><span class="section-kicker">洞天月契生效中</span><h3>余 ${state.monthlyDays} 次每日供奉</h3><p>领取90灵玉；月契期间离线积存上限由8小时提高到12小时。</p></div><button class="primary-button" data-action="claim-monthly" ${monthlyClaimed ? "disabled" : ""}>${monthlyClaimed ? "今日已领取" : "领取今日90灵玉"}</button></section>` : ""}<div class="shop-grid">${D.shopItems.map((item) => { const bought = state.purchases[item.id] || 0, firstDouble = item.type === "jade" && !bought; return `<article class="paper-panel"><span>${item.type === "jade" ? "灵玉充值" : item.type === "monthly" ? "月度权益" : "限购礼包"}</span><h3>${item.name}</h3><strong>${item.price}</strong><p>${item.type === "jade" ? `${item.jade}灵玉${firstDouble ? ` + 首购赠${item.jade}` : ""}` : item.type === "monthly" ? "立即300灵玉；30次每日90灵玉；离线收益上限+4小时" : costText(item.rewards)}</p><button class="small-button" data-action="purchase" data-id="${item.id}" ${!item.repeatable && bought ? "disabled" : ""}>${!item.repeatable && bought ? "已购买" : `试玩购买 ${item.price}`}</button></article>`; }).join("")}</div><section class="dust-shop paper-panel"><div><span class="section-kicker">满命回收</span><h3>天命尘 ${state.resources.fateDust}</h3><p>SR/SSR/UR满命后的重复分别转10/40/100天命尘。</p></div><button data-action="dust-exchange" data-id="fate">通用命印<small>200尘</small></button><button data-action="dust-exchange" data-id="ticket">寻仙令×10<small>80尘</small></button>${["wood", "herbs", "food", "stone"].map((key) => `<button data-action="dust-exchange" data-id="${key}">${RESOURCE_NAMES[key]}6小时<small>60尘</small></button>`).join("")}</section>`;
   }
 
   function formationPanel() {
@@ -150,50 +151,7 @@
     view.innerHTML = `${header("残碑秘境", `当前第${state.currentCycle}轮 · 累计胜利${state.expeditionWins}次。Boss后秘境会重启，不再一次性消失。`)}<div class="stage-list">${stageCards()}</div>${partyPicker()}${formationPanel()}`;
   }
 
-  function sandboxUnitRows(units) {
-    return units.map((u) => {
-      const statuses = (u.statuses || []).map((s) => s.id + (s.stacks > 1 ? "x" + s.stacks : "")).join(" · ");
-      const shield = u.shieldHp ? ` 盾${Math.round(u.shieldHp)}` : "";
-      return `<div class="unit-row"><b>${u.name}</b><small>${u.element} · ${u.position} · SPD${u.speed} · 灵力${u.energy || 0}</small><div class="bar"><span style="width:${Math.max(0, u.hp / u.maxHp * 100)}%"></span></div><small>HP ${u.hp}/${u.maxHp}${shield}</small>${statuses ? `<span class="unit-status">${statuses}</span>` : ""}</div>`;
-    }).join("");
-  }
-  function ensureSandbox() {
-    if (sandboxBattle) return;
-    const presets = Combat.createSandboxPresets();
-    const cfg = { ...presets[sandboxPreset] || presets.balanced, seed: Number(sandboxSeed) || 20260905 };
-    sandboxBattle = Combat.createEncounter(cfg);
-  }
-  function renderSandbox() {
-    if (!Combat) {
-      view.innerHTML = `${header("战斗沙盒", "0.5A 引擎未加载。")}<p class="sandbox-note">缺少 combat-0.5a.js</p>`;
-      return;
-    }
-    ensureSandbox();
-    const b = sandboxBattle;
-    const queue = (!b.finished && b.queue && b.queue.length) ? b.queue : Combat.getTimeline(b);
-    const formation = D.formations.find((f) => f.id === b.formationId) || D.formations[0];
-    view.innerHTML = `${header("0.5A 战斗沙盒", "速度队列原型验收入口。秘境仍使用旧 battleRound，直至适配层就绪。")}
-      <section class="paper-panel sandbox-panel">
-        <p class="sandbox-note">Prototype：配置驱动技能/状态、前3后3+嘲讽、五行轻克制、雷/风无硬克。不消耗体力，不改抽卡。</p>
-        <div class="sandbox-controls">
-          <label>预设 <select data-action="sandbox-preset">${Object.keys(Combat.createSandboxPresets()).map((k) => `<option value="${k}" ${k === sandboxPreset ? "selected" : ""}>${k}</option>`).join("")}</select></label>
-          <label>Seed <input type="number" value="${sandboxSeed}" data-action="sandbox-seed-input" style="width:8rem"></label>
-          <button class="ink-button" data-action="sandbox-reset">重开</button>
-          <button class="primary-button" data-action="sandbox-round" ${b.finished ? "disabled" : ""}>执行一轮</button>
-          <button class="ink-button" data-action="sandbox-auto" ${b.finished ? "disabled" : ""}>自动至结束</button>
-          <button class="formation-active" data-action="sandbox-formation" ${b.formationReady ? "" : "disabled"}>阵法·${formation.active}${b.formationReady ? "" : "（已用）"}</button>
-          <button class="formation-active master" data-action="sandbox-master" ${b.masterReady ? "" : "disabled"}>掌门技·清心令${b.masterReady ? "" : "（已用）"}</button>
-        </div>
-        <p class="sandbox-queue">速度队列：${queue.map((q) => q.uid + "(" + Math.round(q.speed) + ")").join(" → ") || "—"}</p>
-        <p class="sandbox-note">回合 ${b.round}/${b.maxRounds} · ${b.finished ? (b.victory ? "胜利" : "失败") : "进行中"} · engine ${b.engineVersion}</p>
-      </section>
-      <div class="battlefield">
-        <section class="combat-side paper-panel"><h3>我方</h3>${sandboxUnitRows(b.allies)}</section>
-        <section class="combat-log paper-panel"><h3>${b.name}</h3>${b.log.map((line) => `<p>${line}</p>`).join("")}</section>
-        <section class="combat-side paper-panel"><h3>敌方</h3>${sandboxUnitRows(b.enemies)}</section>
-      </div>`;
-  }
-    function renderChronicle() {
+  function renderChronicle() {
     view.innerHTML = `${header("宗门纪事", "关键行为自动存档在当前浏览器。")}
       <div class="chronicle"><section class="paper-panel log-list">${state.log.map((line) => `<div class="log-entry">${line}</div>`).join("")}</section><aside class="paper-panel about-panel"><h3>0.4可玩循环</h3><ul><li>经营：四资源生产、派驻、建筑交叉消耗。</li><li>养成：炼气十四层起步、绝技与五重命印。</li><li>构筑：六人前后排、五行、羁绊与阵法档位。</li><li>结缘：人物UR 3%、六十抽保底与限定50/50。</li><li>回流：秘境循环、Boss奖励重新投入宗门成长。</li></ul></aside></div>`;
   }
@@ -264,29 +222,10 @@
     if (action === "auto-battle") { let safety = 0; while (activeBattle && !activeBattle.finished && safety < 18) { activeBattle = C.battleRound(activeBattle, selectedTactic); safety += 1; } renderExpedition(); }
     if (action === "settle") { const result = commit(C.settleBattle(state, activeBattle), false); if (result.ok) activeBattle = null; render(); }
     if (action === "leave-battle") { activeBattle = null; renderExpedition(); }
-    if (action === "sandbox-reset") {
-      const input = view.querySelector("[data-action='sandbox-seed-input']");
-      if (input) sandboxSeed = Number(input.value) || sandboxSeed;
-      const sel = view.querySelector("select[data-action='sandbox-preset']");
-      if (sel) sandboxPreset = sel.value;
-      sandboxBattle = null; ensureSandbox(); renderSandbox();
-    }
-    if (action === "sandbox-round") { ensureSandbox(); sandboxBattle = Combat.runRound(sandboxBattle); renderSandbox(); }
-    if (action === "sandbox-auto") { ensureSandbox(); sandboxBattle = Combat.runUntilDone(sandboxBattle); renderSandbox(); }
-    if (action === "sandbox-formation") { ensureSandbox(); sandboxBattle = Combat.useFormationActive(sandboxBattle); renderSandbox(); }
-    if (action === "sandbox-master") { ensureSandbox(); sandboxBattle = Combat.useMasterSkill(sandboxBattle); renderSandbox(); }
     if (action === "close-modal") closeModal();
     if (action === "reset" && window.confirm("清除0.4存档并重新开始？")) { localStorage.removeItem(SAVE_KEY); state = C.createInitialState(); activeTab = "sect"; activeBattle = null; save(); render(); openStory(); }
   });
 
-
-  document.addEventListener("change", (event) => {
-    const node = event.target.closest("[data-action]");
-    if (!node) return;
-    const action = node.dataset.action;
-    if (action === "sandbox-preset") { sandboxPreset = node.value; sandboxBattle = null; ensureSandbox(); renderSandbox(); }
-    if (action === "sandbox-seed-input") { sandboxSeed = Number(node.value) || sandboxSeed; }
-  });
 
   const firstVisit = !localStorage.getItem(SAVE_KEY); save(); render(); if (firstVisit) openStory();
 })();

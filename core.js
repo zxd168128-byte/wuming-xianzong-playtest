@@ -361,7 +361,7 @@
     if (!state.firstPurchaseClaimed) {
       state.firstPurchaseClaimed = true; firstGift = grantDisciple(state, findDisciple("ning-hongxiao")); state.resources.seals += 10;
     }
-    return { ok: true, state, message: `沙盒购买成功：${detail}${firstGift ? "；首充礼已到账" : ""}。`, firstGift };
+    return { ok: true, state, message: `试玩购买成功：${detail}${firstGift ? "；首充礼已到账" : ""}。`, firstGift };
   }
   function claimMonthly(source, now = Date.now()) {
     const state = clone(source), key = todayKey(now);
