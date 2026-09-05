@@ -173,3 +173,5 @@ body:not(.tab-sect) .topbar {
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(233, 225, 207, .08);
 }
+
+body:not(.tab-sect) .scene-panel { display: none !important; }
