@@ -159,19 +159,18 @@ body {
   font-size: 14px;
 }
 
-/* Non-sect tabs: reclaim the hero banner space */
-.scene-panel[hidden] { display: none !important; }
-body:not(.tab-sect) .view {
-  min-height: calc(100dvh - 140px);
-  padding-top: 8px;
-}
-body:not(.tab-sect) .topbar {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  background: rgba(10, 18, 19, .96);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(233, 225, 207, .08);
-}
 
-body:not(.tab-sect) .scene-panel { display: none !important; }
+/* Hide hero outside 宗门 — hard override */
+body:not(.tab-sect) #scene-panel,
+body:not(.tab-sect) .scene-panel,
+#scene-panel[hidden],
+.scene-panel[hidden] {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+}

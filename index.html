@@ -6,11 +6,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="stylesheet" href="mobile-extra.css?v=3e103a5">
+  <link rel="stylesheet" href="mobile-extra.css?v=8088bc5b">
   <meta name="theme-color" content="#111a1c">
   <meta name="description" content="原创国风修仙宗门经营游戏0.4.1+0.5A战斗原型：四资源经营、速度队列六人战、异灵根与阵法构筑。">
   <title>无名仙宗 · 手机试玩</title>
-  <link rel="stylesheet" href="styles.css?v=3e103a5">
+  <link rel="stylesheet" href="styles.css?v=8088bc5b">
 </head>
 <body>
   <div class="mist mist-a" aria-hidden="true"></div>
@@ -26,7 +26,7 @@
     </header>
 
     <main>
-      <section class="scene-panel">
+      <section id="scene-panel" class="scene-panel">
         <img src="assets/sect-dawn.png" alt="晨雾中的破败修仙宗门">
         <div class="scene-shade"></div>
         <div class="scene-copy">
@@ -39,7 +39,8 @@
           </div>
         </div>
         <div id="goal-card" class="goal-card"></div>
-      </section>
+      </section><section id="view" class="view" aria-live="polite"></section>
+
 
       <nav class="main-nav" aria-label="主要玩法">
         <button class="active" data-action="tab" data-tab="sect"><span>山</span>宗门</button>
@@ -49,15 +50,14 @@
         <button data-action="tab" data-tab="chronicle"><span>录</span>纪事</button>
       </nav>
 
-      <section id="view" class="view" aria-live="polite"></section>
-    </main>
+          </main>
   </div>
 
   <div id="modal" class="modal" hidden></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=3e103a5"></script>
-  <script src="core.js?v=3e103a5"></script>
-<script src="app.js?v=3e103a5"></script>
+  <script src="data.js?v=8088bc5b"></script>
+  <script src="core.js?v=8088bc5b"></script>
+<script src="app.js?v=8088bc5b"></script>
 </body>
 </html>

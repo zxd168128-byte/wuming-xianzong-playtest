@@ -47,7 +47,7 @@
     el("#scene-eyebrow").textContent = `青崖山南麓 · 第${state.day}日 · 秘境第${state.currentCycle}轮`;
     el("#goal-card").innerHTML = goalMarkup();
     document.querySelectorAll(".main-nav button").forEach((button) => button.classList.toggle("active", button.dataset.tab === activeTab));
-    const scene = el(".scene-panel");
+    const scene = el("#scene-panel") || el(".scene-panel");
     if (scene) scene.hidden = activeTab !== "sect";
     document.body.classList.toggle("tab-sect", activeTab === "sect");
     if (state.currentCycle > 1) { el("#scene-title").textContent = "灵潮复起，道阻且长"; el("#scene-text").textContent = `墨蛟虽伏，秘境已进入第${state.currentCycle}轮。更强的敌人和更丰厚的资源正在山下重生。`; }
